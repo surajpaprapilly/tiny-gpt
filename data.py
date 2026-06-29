@@ -44,7 +44,6 @@ def get_batch(encoded_text,block_size=128,batch_size=32):
     for i in range(0,batch_size):
         starting_index = random.randint(0,max_len-block_size-1)
         x_vector = encoded_text[starting_index:starting_index+block_size]
-        print("HIIIII", x_vector)
         y_vector = encoded_text[starting_index+1:starting_index+1+block_size]
         x_store.append(x_vector)
         y_store.append(y_vector)
