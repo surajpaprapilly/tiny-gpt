@@ -20,19 +20,22 @@ class SingleHeadAttention(nn.Module):
         q = self.q_proj(x)
         k = self.k_proj(x)
         v = self.v_proj(x)
-        scores = q @ k.transpose(-2, -1) / (self.head_dim ** 0.5)
 
-        # Mask
-        mask = torch.tril(torch.ones(scores.size(-2), scores.size(-1), device=scores.device))
-        scores = scores.masked_fill(mask == 0, float("-inf"))
+        # Calculate the attention score. How much a token at i attends to a token at j
+        scores = (q @ k.transpose(-2, -1))/(self.head_dim ** 0.5)
 
-        # Softmax
-        attention_weights = torch.softmax(scores, dim=1)
+        # Apply causal mask
+        seq_len = q.shape[0]
+        scores = scores.masked_fill(~torch.tril(torch.ones(seq_len,seq_len)).bool(),float('-inf'))
+        
+        # Apply softmax
+        weights = torch.softmax(scores, dim=-1)
 
-        # Weighted sum
-        out = attention_weights @ v
+        out = weights @ v
 
         return out
+
+        
 
 
 
